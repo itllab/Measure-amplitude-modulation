@@ -25,6 +25,8 @@ inst_1 = 0
 inst_2 = 0
 ws = 0
 wb = 0
+span = ["100Hz", "1kHz", "10kHz", "100kHz", "1MHz", "10MHz"]
+xz = 0
 
 def tip():
         global rm1
@@ -61,7 +63,7 @@ class id_tip():
                                 if index_b2 >= 0:
                                         (self.x_combo).set(rm1[i])
                                 i=i+1
-
+                
 def click_connect():
         x = id_tip('N9030A','0x0D0B', combo1,e) #class id_tip
         x.id_tip()
@@ -90,8 +92,86 @@ def click_connect():
                         text.see("end")
                         text.config(state=DISABLED)       
                         
+class ed_izm():
+        def __init__(self, izm, Gx, Mx, kx, x, mx, mkx, nx):
+                self.izm = izm
+                self.Gx = Gx
+                self.Mx = Mx
+                self.kx = kx
+                self.x = x
+                self.mx = mx
+                self.mkx = mkx
+                self.nx = nx
+        def ed_izm(self):
+                global xz
+                if self.izm >= 1000000000:
+                        self.izm = self.izm / 1000000000
+                        self.izm = str(self.izm) + self.Gx
+                        xz = self.izm
+                elif self.izm >= 1000000:
+                        self.izm = self.izm / 1000000
+                        self.izm = str(self.izm) + self.Mx
+                        xz = self.izm
+                elif self.izm >= 1000:
+                        self.izm = self.izm / 1000
+                        self.izm = str(self.izm) + self.kx
+                        xz = self.izm
+                elif self.izm >= 1:
+                        self.izm = self.izm / 1
+                        self.izm = str(self.izm) + self.x
+                        xz = self.izm
+                elif self.izm >= 0.001:
+                        self.izm = self.izm * 1000
+                        self.izm = str(self.izm) + self.mx
+                        xz = self.izm
+                elif self.izm >= 0.000001:
+                        self.izm = self.izm * 1000000
+                        self.izm = str(self.izm) + self.mkx
+                        xz = self.izm
+                elif self.izm >= 0.000000001:
+                        self.izm = self.izm * 1000000000
+                        self.izm = str(self.izm) + self.nx
+                        xz = self.izm
+                elif self.izm <= -1000000000:
+                        self.izm = self.izm / 1000000000
+                        self.izm = str(self.izm) + self.Gx
+                        xz = self.izm
+                elif self.izm <= -1000000:
+                        self.izm = self.izm / 1000000
+                        self.izm = str(self.izm) + self.Mx
+                        xz = self.izm
+                elif self.izm <= -1000:
+                        self.izm = self.izm / 1000
+                        self.izm = str(self.izm) + self.kx
+                        xz = self.izm
+                elif self.izm <= -1:
+                        self.izm = self.izm / 1
+                        self.izm = str(self.izm) + self.x
+                        xz = self.izm
+                elif self.izm <= -0.001:
+                        self.izm = self.izm * 1000
+                        self.izm = str(self.izm) + self.mx
+                        xz = self.izm
+                elif self.izm <= -0.000001:
+                        self.izm = self.izm * 1000000
+                        self.izm = str(self.izm) + self.mkx
+                        xz = self.izm
+                elif self.izm <= -0.000000001:
+                        self.izm = self.izm * 1000000000
+                        self.izm = str(self.izm) + self.nx
+                        xz = self.izm       
+           
 def click_startAM():
+        global span
         inst_1.write("FREQuency:TUNE:IMM")
+        s=0
+        T=(1*1000)+1
+        while s<T: 
+                time.sleep (0.1)
+                pb1.step(1)
+                root.update()
+                s=s+100
+        inst_1.write("FREQ:SPAN "+combo2.get())
         s=0
         T=(1*1000)+1
         while s<T: 
@@ -108,30 +188,49 @@ def click_startAM():
         inst_1.write("CALC:MARK3:MAX:NEXT")
         inst_1.write("CALC:MARK3:MAX:NEXT")
         inst_1.write("UNIT:POWer V")
+        
         mark1 = inst_1.query("CALC:MARK1:Y?")
         mark1 = float(mark1)
-        mark11.set("{0:.5f} мВ".format(mark1))
+        x = ed_izm(mark1, ' ГВ', ' МВ', ' кВ', ' В', ' мВ', ' мкВ', ' нВ')
+        x.ed_izm()
+        mark11.set(xz)
+        #mark11.set("{0:.5f} мВ".format(mark1))
         mark1f = inst_1.query("CALC:MARK1:X?")
         mark1f = float(mark1f)
-        mark121f= mark1f/1000000000
-        mark21.set("{0:.6f} ГГц".format(mark121f))
+        x = ed_izm(mark1f, ' ГГц', ' МГц', ' кГц', ' Гц', ' мГц', ' мкГц', ' нГц')
+        x.ed_izm()
+        mark21.set(xz)
+        #mark121f= mark1f/1000000000
+        #mark21.set("{0:.6f} ГГц".format(mark121f))
         
         mark2 = inst_1.query("CALC:MARK2:Y?")
         mark2 = float(mark2)
-        mark12.set("{0:.5f} мВ".format(mark2))
+        x = ed_izm(mark2, ' ГВ', ' МВ', ' кВ', ' В', ' мВ', ' мкВ', ' нВ')
+        x.ed_izm()
+        mark12.set(xz)
+        #mark12.set("{0:.5f} мВ".format(mark2))
         mark2f = inst_1.query("CALC:MARK2:X?")
         mark2f = float(mark2f)
         mark2f = mark2f - mark1f
-        mark22.set("{0:.1f} Гц".format(mark2f))
+        x = ed_izm(mark2f, ' ГГц', ' МГц', ' кГц', ' Гц', ' мГц', ' мкГц', ' нГц')
+        x.ed_izm()
+        mark22.set(xz)
+        #mark22.set("{0:.1f} Гц".format(mark2f))
         
         mark3 = inst_1.query("CALC:MARK3:Y?")
         mark3 = float(mark3)
-        mark13.set("{0:.5f} мВ".format(mark3))
+        x = ed_izm(mark3, ' ГВ', ' МВ', ' кВ', ' В', ' мВ', ' мкВ', ' нВ')
+        x.ed_izm()
+        mark13.set(xz)
+        #mark13.set("{0:.5f} мВ".format(mark3))
         mark3f = inst_1.query("CALC:MARK3:X?")
         mark3f = float(mark3f)
         mark3f = mark3f - mark1f
-        mark23.set("{0:.1f} Гц".format(mark3f))
-        
+        x = ed_izm(mark3f, ' ГГц', ' МГц', ' кГц', ' Гц', ' мГц', ' мкГц', ' нГц')
+        x.ed_izm()
+        mark23.set(xz) 
+        #mark23.set("{0:.1f} Гц".format(mark3f))
+
         kAM1 = (mark2 + mark3)/mark1*100
         kAM1 = float(kAM1)
         kAM.set("{0:.3f} %".format(kAM1))
@@ -142,7 +241,7 @@ def click_startAM():
 root = Tk()
 ix = (root.winfo_screenwidth() - root.winfo_reqwidth()) / 3
 iy = (root.winfo_screenheight() - root.winfo_reqheight()) / 3
-root.title("Modulations 1.0")
+root.title("Modulations 1.1")
 root.geometry("810x410+%d+%d" % (ix, iy))
 root.iconbitmap("icon.ico")
 root.resizable(width=False, height=False)
@@ -178,6 +277,8 @@ c=StringVar()
 c.set('')
 e=StringVar()
 
+
+
 kAM=StringVar()
 kAM.set('')
 mark11=StringVar()
@@ -208,6 +309,11 @@ lab1.place(x=125,y=5)
 entry2 = ttk.Entry(tab2, state='readonly', textvariable = kAM, width = 8, font='calibri 20')
 entry2.place(x=100,y=25)
 
+combo2 = ttk.Combobox(tab2, values=span, state='readonly', height=10, width=6, font='calibri 12')
+combo2.place(x=50,y=100)
+lab11 = ttk.Label(tab2, text='Span', style="TLabel", font='calibri 12')
+lab11.place(x=10,y=100)
+
 lab3 = ttk.Label(tab2, text='Уровень несущей', style="TLabel", font='calibri 10')
 lab3.place(x=250,y=25)
 entry3 = ttk.Entry(tab2, state='readonly', textvariable = mark11, width = 10, font='calibri 12')
@@ -223,7 +329,7 @@ entry5.place(x=400,y=75)
 
 lab6 = ttk.Label(tab2, text='Частота несущей', style="TLabel", font='calibri 10')
 lab6.place(x=500,y=25)
-entry6 = ttk.Entry(tab2, state='readonly', textvariable = mark21, width = 14, font='calibri 12')
+entry6 = ttk.Entry(tab2, state='readonly', textvariable = mark21, width = 18, font='calibri 12')
 entry6.place(x=650,y=25)
 lab7 = ttk.Label(tab2, text='Частота первой боковой', style="TLabel", font='calibri 10')
 lab7.place(x=500,y=50)
