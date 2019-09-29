@@ -1,3 +1,4 @@
+![alt text](https://github.com/itllab/DMM/blob/master/Image/1.png)
 ## Измерение амплитудной модуляции (Measure amplitude modulation)
 + Version: Python 2.7
 + Lib: PyVisa
